@@ -1,0 +1,368 @@
+{% extends "base.html" %}
+
+{% block title %}تعديل {{ character.name }} - روحي{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <!-- Header -->
+    <div class="flex items-center gap-4 mb-8">
+        <a href="/character/{{ character.id }}" class="text-gray-400 hover:text-white transition">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+            </svg>
+        </a>
+        <h1 class="text-3xl font-bold">✏️ تعديل {{ character.name }}</h1>
+    </div>
+
+    <form id="editForm" class="space-y-8">
+        
+        <!-- الطبقة 1: الهوية الأساسية -->
+        <div class="card">
+            <h2 class="text-xl font-bold mb-6 flex items-center gap-2">
+                <span class="text-2xl">👤</span>
+                الهوية الأساسية
+            </h2>
+            
+            <div class="grid md:grid-cols-2 gap-6">
+                <!-- الاسم -->
+                <div>
+                    <label class="block text-gray-300 mb-2">الاسم</label>
+                    <input type="text" name="name" value="{{ character.name }}" required
+                           class="w-full bg-gray-700 rounded-lg px-4 py-3 focus:ring-2 focus:ring-purple-500 outline-none">
+                </div>
+                
+                <!-- العمر -->
+                <div>
+                    <label class="block text-gray-300 mb-2">العمر</label>
+                    <input type="number" name="age" value="{{ character.age }}" required min="18" max="99"
+                           class="w-full bg-gray-700 rounded-lg px-4 py-3 focus:ring-2 focus:ring-purple-500 outline-none">
+                </div>
+                
+                <!-- الجنس -->
+                <div>
+                    <label class="block text-gray-300 mb-2">الجنس</label>
+                    <select name="gender" class="w-full bg-gray-700 rounded-lg px-4 py-3 focus:ring-2 focus:ring-purple-500 outline-none">
+                        <option value="female" {% if character.gender == 'female' %}selected{% endif %}>أنثى 👩</option>
+                        <option value="male" {% if character.gender == 'male' %}selected{% endif %}>ذكر 👨</option>
+                        <option value="non_binary" {% if character.gender == 'non_binary' %}selected{% endif %}>غير محدد 🧑</option>
+                    </select>
+                </div>
+                
+                <!-- اللون -->
+                <div>
+                    <label class="block text-gray-300 mb-2">اللون المميز</label>
+                    <div class="flex gap-2">
+                        <input type="color" name="avatar_color" value="{{ character.avatar_color }}"
+                               class="w-16 h-12 rounded cursor-pointer">
+                        <input type="text" value="{{ character.avatar_color }}" id="colorText"
+                               class="flex-1 bg-gray-700 rounded-lg px-4 py-3 focus:ring-2 focus:ring-purple-500 outline-none"
+                               onchange="document.querySelector('[name=avatar_color]').value = this.value">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- السيرة / القصة -->
+            <div class="mt-6">
+                <label class="block text-gray-300 mb-2">القصة والخلفية</label>
+                <textarea name="backstory" rows="6"
+                          class="w-full bg-gray-700 rounded-lg px-4 py-3 focus:ring-2 focus:ring-purple-500 outline-none resize-none">{{ character.backstory }}</textarea>
+            </div>
+        </div>
+
+        <!-- الطبقة 2: الشخصية (Big 5) -->
+        <div class="card">
+            <h2 class="text-xl font-bold mb-6 flex items-center gap-2">
+                <span class="text-2xl">🎭</span>
+                الشخصية (Big 5)
+            </h2>
+            
+            <!-- Openness -->
+            <div class="mb-6">
+                <div class="flex justify-between mb-2">
+                    <span class="text-gray-300">الانفتاح على التجارب</span>
+                    <span id="opennessValue" class="text-purple-400">{{ (character.personality_openness * 100)|int }}%</span>
+                </div>
+                <div class="flex items-center gap-4">
+                    <span class="text-sm text-gray-500">تقليدي</span>
+                    <input type="range" name="personality_openness" min="0" max="100" 
+                           value="{{ (character.personality_openness * 100)|int }}" 
+                           class="flex-1 accent-purple-500" 
+                           oninput="document.getElementById('opennessValue').textContent = this.value + '%'">
+                    <span class="text-sm text-gray-500">مبدع</span>
+                </div>
+            </div>
+            
+            <!-- Conscientiousness -->
+            <div class="mb-6">
+                <div class="flex justify-between mb-2">
+                    <span class="text-gray-300">الضمير / التنظيم</span>
+                    <span id="conscientiousnessValue" class="text-purple-400">{{ (character.personality_conscientiousness * 100)|int }}%</span>
+                </div>
+                <div class="flex items-center gap-4">
+                    <span class="text-sm text-gray-500">عفوي</span>
+                    <input type="range" name="personality_conscientiousness" min="0" max="100" 
+                           value="{{ (character.personality_conscientiousness * 100)|int }}" 
+                           class="flex-1 accent-purple-500" 
+                           oninput="document.getElementById('conscientiousnessValue').textContent = this.value + '%'">
+                    <span class="text-sm text-gray-500">منظم</span>
+                </div>
+            </div>
+            
+            <!-- Extraversion -->
+            <div class="mb-6">
+                <div class="flex justify-between mb-2">
+                    <span class="text-gray-300">الانبساط</span>
+                    <span id="extraversionValue" class="text-purple-400">{{ (character.personality_extraversion * 100)|int }}%</span>
+                </div>
+                <div class="flex items-center gap-4">
+                    <span class="text-sm text-gray-500">انطوائي</span>
+                    <input type="range" name="personality_extraversion" min="0" max="100" 
+                           value="{{ (character.personality_extraversion * 100)|int }}" 
+                           class="flex-1 accent-purple-500" 
+                           oninput="document.getElementById('extraversionValue').textContent = this.value + '%'">
+                    <span class="text-sm text-gray-500">اجتماعي</span>
+                </div>
+            </div>
+            
+            <!-- Agreeableness -->
+            <div class="mb-6">
+                <div class="flex justify-between mb-2">
+                    <span class="text-gray-300">الوفاق / التعاون</span>
+                    <span id="agreeablenessValue" class="text-purple-400">{{ (character.personality_agreeableness * 100)|int }}%</span>
+                </div>
+                <div class="flex items-center gap-4">
+                    <span class="text-sm text-gray-500">تنافسي</span>
+                    <input type="range" name="personality_agreeableness" min="0" max="100" 
+                           value="{{ (character.personality_agreeableness * 100)|int }}" 
+                           class="flex-1 accent-purple-500" 
+                           oninput="document.getElementById('agreeablenessValue').textContent = this.value + '%'">
+                    <span class="text-sm text-gray-500">متعاون</span>
+                </div>
+            </div>
+            
+            <!-- Neuroticism -->
+            <div class="mb-6">
+                <div class="flex justify-between mb-2">
+                    <span class="text-gray-300">العصابية / الحساسية</span>
+                    <span id="neuroticismValue" class="text-purple-400">{{ (character.personality_neuroticism * 100)|int }}%</span>
+                </div>
+                <div class="flex items-center gap-4">
+                    <span class="text-sm text-gray-500">مستقر</span>
+                    <input type="range" name="personality_neuroticism" min="0" max="100" 
+                           value="{{ (character.personality_neuroticism * 100)|int }}" 
+                           class="flex-1 accent-purple-500" 
+                           oninput="document.getElementById('neuroticismValue').textContent = this.value + '%'">
+                    <span class="text-sm text-gray-500">حساس</span>
+                </div>
+            </div>
+            
+            <!-- أسلوب التواصل -->
+            <div class="mt-8">
+                <label class="block text-gray-300 mb-2">أسلوب التواصل</label>
+                <input type="text" name="communication_style" value="{{ character.communication_style }}"
+                       placeholder="مثال: رومانسي، ساخر، فلسفي، مرح..."
+                       class="w-full bg-gray-700 rounded-lg px-4 py-3 focus:ring-2 focus:ring-purple-500 outline-none">
+            </div>
+            
+            <!-- نبرة الكلام -->
+            <div class="mt-4">
+                <label class="block text-gray-300 mb-2">نبرة الكلام</label>
+                <select name="speaking_tone" class="w-full bg-gray-700 rounded-lg px-4 py-3 focus:ring-2 focus:ring-purple-500 outline-none">
+                    <option value="friendly" {% if character.speaking_tone == 'friendly' %}selected{% endif %}>ودود</option>
+                    <option value="formal" {% if character.speaking_tone == 'formal' %}selected{% endif %}>رسمي</option>
+                    <option value="casual" {% if character.speaking_tone == 'casual' %}selected{% endif %}>عفوي</option>
+                    <option value="romantic" {% if character.speaking_tone == 'romantic' %}selected{% endif %}>رومانسي</option>
+                    <option value="mysterious" {% if character.speaking_tone == 'mysterious' %}selected{% endif %}>غامض</option>
+                    <option value="playful" {% if character.speaking_tone == 'playful' %}selected{% endif %}>مرح</option>
+                </select>
+            </div>
+            
+            <!-- مستوى الفكاهة -->
+            <div class="mt-6">
+                <div class="flex justify-between mb-2">
+                    <span class="text-gray-300">مستوى الفكاهة</span>
+                    <span id="humorValue" class="text-purple-400">{{ (character.humor_level * 100)|int }}%</span>
+                </div>
+                <input type="range" name="humor_level" min="0" max="100" 
+                       value="{{ (character.humor_level * 100)|int }}" 
+                       class="w-full accent-purple-500" 
+                       oninput="document.getElementById('humorValue').textContent = this.value + '%'">
+            </div>
+        </div>
+
+        <!-- الطبقة 3: العالم الداخلي -->
+        <div class="card">
+            <h2 class="text-xl font-bold mb-6 flex items-center gap-2">
+                <span class="text-2xl">💭</span>
+                العالم الداخلي
+            </h2>
+            
+            <!-- المخاوف -->
+            <div class="mb-6">
+                <label class="block text-gray-300 mb-2">المخاوف العميقة (واحد في كل سطر)</label>
+                <textarea name="deep_fears" rows="3" id="fearsInput"
+                          class="w-full bg-gray-700 rounded-lg px-4 py-3 focus:ring-2 focus:ring-purple-500 outline-none resize-none"></textarea>
+            </div>
+            
+            <!-- الأحلام -->
+            <div class="mb-6">
+                <label class="block text-gray-300 mb-2">الأحلام المخفية (واحد في كل سطر)</label>
+                <textarea name="hidden_dreams" rows="3" id="dreamsInput"
+                          class="w-full bg-gray-700 rounded-lg px-4 py-3 focus:ring-2 focus:ring-purple-500 outline-none resize-none"></textarea>
+            </div>
+            
+            <!-- الجروح -->
+            <div class="mb-6">
+                <label class="block text-gray-300 mb-2">الجروح القديمة (واحد في كل سطر)</label>
+                <textarea name="past_wounds" rows="3" id="woundsInput"
+                          class="w-full bg-gray-700 rounded-lg px-4 py-3 focus:ring-2 focus:ring-purple-500 outline-none resize-none"></textarea>
+            </div>
+            
+            <!-- القيم -->
+            <div class="mb-6">
+                <label class="block text-gray-300 mb-2">القيم الأساسية (واحد في كل سطر)</label>
+                <textarea name="core_values" rows="3" id="valuesInput"
+                          class="w-full bg-gray-700 rounded-lg px-4 py-3 focus:ring-2 focus:ring-purple-500 outline-none resize-none"></textarea>
+            </div>
+            
+            <!-- نقطة الانكسار -->
+            <div>
+                <label class="block text-gray-300 mb-2">نقطة الانكسار 💔</label>
+                <input type="text" name="breaking_point" value="{{ character.breaking_point }}"
+                       class="w-full bg-gray-700 rounded-lg px-4 py-3 focus:ring-2 focus:ring-purple-500 outline-none">
+            </div>
+        </div>
+
+        <!-- أزرار الحفظ -->
+        <div class="flex gap-4">
+            <button type="submit" class="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold py-4 px-8 rounded-xl transition transform hover:scale-[1.02]">
+                💾 حفظ التغييرات
+            </button>
+            <a href="/character/{{ character.id }}" class="bg-gray-700 hover:bg-gray-600 text-white font-bold py-4 px-8 rounded-xl transition text-center">
+                إلغاء
+            </a>
+        </div>
+    </form>
+    
+    <!-- منطقة الخطر -->
+    <div class="card border border-red-500/30 mt-8">
+        <h2 class="text-xl font-bold mb-4 text-red-400">⚠️ منطقة الخطر</h2>
+        
+        <div class="flex flex-col md:flex-row gap-4">
+            <button onclick="resetCharacter()" class="flex-1 bg-orange-500/20 hover:bg-orange-500/30 text-orange-400 font-bold py-3 px-6 rounded-xl transition">
+                🔄 إعادة تعيين العلاقة
+                <span class="block text-sm font-normal">حذف المحادثات والذكريات فقط</span>
+            </button>
+            
+            <button onclick="deleteCharacter()" class="flex-1 bg-red-500/20 hover:bg-red-500/30 text-red-400 font-bold py-3 px-6 rounded-xl transition">
+                🗑️ حذف الشخصية
+                <span class="block text-sm font-normal">حذف نهائي لكل شيء</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+// تحميل البيانات الأولية
+const characterData = {
+    deep_fears: {{ character.deep_fears | safe }},
+    hidden_dreams: {{ character.hidden_dreams | safe }},
+    past_wounds: {{ character.past_wounds | safe }},
+    core_values: {{ character.core_values | safe }}
+};
+
+function parseJsonSafe(data) {
+    if (typeof data === 'string') {
+        try { return JSON.parse(data); } catch(e) { return []; }
+    }
+    return Array.isArray(data) ? data : [];
+}
+
+// ملء الحقول
+document.getElementById('fearsInput').value = parseJsonSafe(characterData.deep_fears).join('\n');
+document.getElementById('dreamsInput').value = parseJsonSafe(characterData.hidden_dreams).join('\n');
+document.getElementById('woundsInput').value = parseJsonSafe(characterData.past_wounds).join('\n');
+document.getElementById('valuesInput').value = parseJsonSafe(characterData.core_values).join('\n');
+
+// تحديث لون النص
+document.querySelector('[name=avatar_color]').addEventListener('input', function() {
+    document.getElementById('colorText').value = this.value;
+});
+
+// حفظ النموذج
+document.getElementById('editForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    
+    const data = {
+        name: formData.get('name'),
+        age: parseInt(formData.get('age')),
+        gender: formData.get('gender'),
+        avatar_color: formData.get('avatar_color'),
+        backstory: formData.get('backstory'),
+        
+        personality_openness: parseInt(formData.get('personality_openness')) / 100,
+        personality_conscientiousness: parseInt(formData.get('personality_conscientiousness')) / 100,
+        personality_extraversion: parseInt(formData.get('personality_extraversion')) / 100,
+        personality_agreeableness: parseInt(formData.get('personality_agreeableness')) / 100,
+        personality_neuroticism: parseInt(formData.get('personality_neuroticism')) / 100,
+        
+        communication_style: formData.get('communication_style'),
+        speaking_tone: formData.get('speaking_tone'),
+        humor_level: parseInt(formData.get('humor_level')) / 100,
+        
+        deep_fears: formData.get('deep_fears').split('\n').filter(x => x.trim()),
+        hidden_dreams: formData.get('hidden_dreams').split('\n').filter(x => x.trim()),
+        past_wounds: formData.get('past_wounds').split('\n').filter(x => x.trim()),
+        core_values: formData.get('core_values').split('\n').filter(x => x.trim()),
+        breaking_point: formData.get('breaking_point')
+    };
+    
+    try {
+        const response = await fetch('/api/character/{{ character.id }}', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            showToast('تم حفظ التغييرات بنجاح', 'success');
+            setTimeout(() => window.location.href = '/character/{{ character.id }}', 1000);
+        } else {
+            showToast('خطأ في الحفظ', 'error');
+        }
+    } catch (error) {
+        showToast('حدث خطأ في الاتصال', 'error');
+    }
+});
+
+function resetCharacter() {
+    if (confirm('هل أنت متأكد؟ سيتم حذف كل المحادثات والذكريات!')) {
+        fetch('/api/reset/{{ character.id }}', { method: 'POST' })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    showToast('تم إعادة التعيين بنجاح', 'success');
+                    setTimeout(() => location.reload(), 1000);
+                }
+            });
+    }
+}
+
+function deleteCharacter() {
+    if (confirm('هل أنت متأكد من حذف "{{ character.name }}"؟\n\nسيتم حذف الشخصية نهائياً!')) {
+        fetch('/api/character/{{ character.id }}', { method: 'DELETE' })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    showToast('تم حذف الشخصية', 'success');
+                    setTimeout(() => window.location.href = '/', 1000);
+                }
+            });
+    }
+}
+</script>
+{% endblock %}

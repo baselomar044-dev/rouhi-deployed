@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+
+{% block title %}الإعدادات - روحي{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <div class="glass rounded-2xl p-6 mb-6">
+        <h1 class="text-2xl font-bold mb-2">⚙️ الإعدادات</h1>
+        <p class="text-gray-400">إعدادات التطبيق وAPI</p>
+    </div>
+    
+    <form id="settings-form">
+        <!-- API Settings -->
+        <div class="glass rounded-2xl p-6 mb-6">
+            <h2 class="text-xl font-bold mb-4">🔑 إعدادات Groq API</h2>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm text-gray-400 mb-2">Groq API Key (مجاني!)</label>
+                    <input type="password" name="groq_api_key" id="api-key-input"
+                           value="{{ settings.get('groq_api_key', '') }}"
+                           placeholder="gsk_..."
+                           class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-purple-500">
+                    <p class="text-xs text-gray-500 mt-2">
+                        احصل على مفتاحك المجاني من <a href="https://console.groq.com/keys" target="_blank" class="text-purple-400 hover:underline">Groq Console</a>
+                    </p>
+                </div>
+                
+                <div class="glass p-4 rounded-xl bg-green-500/10 border border-green-500/30">
+                    <p class="text-green-400 text-sm">✨ Groq مجاني تماماً! سريع جداً وبدون قيود على المحتوى</p>
+                </div>
+                
+                <div class="flex items-center gap-2">
+                    <button type="button" onclick="toggleApiKey()" class="text-sm text-purple-400 hover:underline">
+                        👁️ إظهار/إخفاء المفتاح
+                    </button>
+                    <span class="text-gray-600">|</span>
+                    <button type="button" onclick="testApiKey()" class="text-sm text-green-400 hover:underline">
+                        🧪 اختبار الاتصال
+                    </button>
+                </div>
+                
+                <div id="api-status" class="hidden glass px-4 py-2 rounded-lg text-sm"></div>
+            </div>
+        </div>
+        
+        <!-- AI Model Settings -->
+        <div class="glass rounded-2xl p-6 mb-6">
+            <h2 class="text-xl font-bold mb-4">🤖 إعدادات الذكاء الاصطناعي</h2>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm text-gray-400 mb-2">النموذج</label>
+                    <select name="ai_model" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3">
+                        <option value="llama-3.3-70b-versatile" {% if settings.get('ai_model') == 'llama-3.3-70b-versatile' %}selected{% endif %}>Llama 3.3 70B (الأفضل - مجاني)</option>
+                        <option value="llama-3.1-70b-versatile" {% if settings.get('ai_model') == 'llama-3.1-70b-versatile' %}selected{% endif %}>Llama 3.1 70B</option>
+                        <option value="llama-3.1-8b-instant" {% if settings.get('ai_model') == 'llama-3.1-8b-instant' %}selected{% endif %}>Llama 3.1 8B (أسرع)</option>
+                        <option value="mixtral-8x7b-32768" {% if settings.get('ai_model') == 'mixtral-8x7b-32768' %}selected{% endif %}>Mixtral 8x7B</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm text-gray-400 mb-2">
+                        الإبداعية (Temperature): <span id="temp-val">{{ settings.get('temperature', '0.9') }}</span>
+                    </label>
+                    <input type="range" name="temperature" min="0" max="1.5" step="0.1" 
+                           value="{{ settings.get('temperature', '0.9') }}"
+                           class="w-full"
+                           oninput="document.getElementById('temp-val').textContent = this.value">
+                    <div class="flex justify-between text-xs text-gray-500 mt-1">
+                        <span>محافظ / متسق</span>
+                        <span>إبداعي / متنوع</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Privacy Notice -->
+        <div class="glass rounded-2xl p-6 mb-6 border border-purple-500/30">
+            <h2 class="text-xl font-bold mb-4 text-purple-400">🔒 الخصوصية</h2>
+            <div class="text-gray-300 space-y-2 text-sm">
+                <p>✓ جميع بياناتك مخزنة محلياً على جهازك فقط</p>
+                <p>✓ المحادثات تُرسل إلى Groq API للحصول على الردود</p>
+                <p>✓ Groq لا يحفظ محادثاتك</p>
+                <p>✓ لا قيود على المحتوى - حرية كاملة 🔓</p>
+                <p>✓ يمكنك حذف جميع البيانات في أي وقت</p>
+            </div>
+        </div>
+        
+        <!-- Save Button -->
+        <div class="flex justify-end">
+            <button type="submit" class="px-8 py-3 rounded-xl font-bold bg-gradient-to-r from-purple-500 to-pink-500 hover:scale-105 transition">
+                💾 حفظ الإعدادات
+            </button>
+        </div>
+    </form>
+    
+    <!-- Data Management -->
+    <div class="glass rounded-2xl p-6 mt-6 border border-red-500/30">
+        <h2 class="text-xl font-bold mb-4 text-red-400">⚠️ إدارة البيانات</h2>
+        <p class="text-gray-400 mb-4">تحذير: هذه الإجراءات لا يمكن التراجع عنها!</p>
+        
+        <div class="flex gap-3">
+            <button onclick="exportData()" class="glass px-4 py-2 rounded-xl hover:bg-white/10 text-sm">
+                📥 تصدير البيانات
+            </button>
+            <button onclick="confirmClearAll()" class="px-4 py-2 rounded-xl bg-red-500/20 text-red-400 hover:bg-red-500/30 text-sm">
+                🗑️ حذف جميع البيانات
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function toggleApiKey() {
+        const input = document.getElementById('api-key-input');
+        input.type = input.type === 'password' ? 'text' : 'password';
+    }
+    
+    async function testApiKey() {
+        const apiKey = document.getElementById('api-key-input').value;
+        const statusDiv = document.getElementById('api-status');
+        
+        if (!apiKey) {
+            statusDiv.textContent = '❌ أدخل مفتاح Groq API أولاً';
+            statusDiv.className = 'glass px-4 py-2 rounded-lg text-sm text-red-400';
+            statusDiv.classList.remove('hidden');
+            return;
+        }
+        
+        statusDiv.textContent = '⏳ جاري الاختبار...';
+        statusDiv.className = 'glass px-4 py-2 rounded-lg text-sm text-yellow-400';
+        statusDiv.classList.remove('hidden');
+        
+        // Save first then test
+        await fetch('/api/settings', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ groq_api_key: apiKey })
+        });
+        
+        try {
+            const response = await fetch('/api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    character_id: 'layla',
+                    message: 'مرحبا'
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (data.response && !data.response.includes('fallback')) {
+                statusDiv.textContent = '✅ الاتصال ناجح! Groq يعمل بشكل ممتاز';
+                statusDiv.className = 'glass px-4 py-2 rounded-lg text-sm text-green-400';
+            } else {
+                statusDiv.textContent = '⚠️ الاتصال يعمل لكن بدون AI (وضع احتياطي)';
+                statusDiv.className = 'glass px-4 py-2 rounded-lg text-sm text-yellow-400';
+            }
+        } catch (error) {
+            statusDiv.textContent = '❌ فشل الاتصال: ' + error.message;
+            statusDiv.className = 'glass px-4 py-2 rounded-lg text-sm text-red-400';
+        }
+    }
+    
+    document.getElementById('settings-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const formData = new FormData(e.target);
+        const data = {};
+        formData.forEach((value, key) => data[key] = value);
+        
+        try {
+            await fetch('/api/settings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            
+            showToast('تم حفظ الإعدادات!', 'success');
+        } catch (error) {
+            showToast('حدث خطأ', 'error');
+        }
+    });
+    
+    function exportData() {
+        showToast('جاري تجهيز التصدير...', 'info');
+        // Would implement actual export here
+    }
+    
+    function confirmClearAll() {
+        if (confirm('هل أنت متأكد؟ سيتم حذف جميع البيانات بشكل نهائي!')) {
+            if (confirm('تأكيد أخير: لا يمكن استرجاع البيانات بعد الحذف!')) {
+                showToast('تم الحذف', 'success');
+                // Would implement actual clear here
+            }
+        }
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+
+{% block title %}روحي - رفقاء بعمق إنساني{% endblock %}
+
+{% block content %}
+<div class="text-center mb-12">
+    <h1 class="text-5xl font-bold mb-4 bg-gradient-to-r from-purple-400 via-pink-400 to-purple-400 bg-clip-text text-transparent">
+        مرحباً بك في روحي
+    </h1>
+    <p class="text-xl text-gray-400 max-w-2xl mx-auto">
+        رفقاء ذكاء اصطناعي بعمق إنساني حقيقي. كل شخصية لها قصتها، أسرارها، ومشاعرها الخاصة.
+    </p>
+</div>
+
+<!-- Characters Grid -->
+<div class="grid md:grid-cols-3 gap-8 mb-8">
+    {% for char in characters %}
+    <div class="glass rounded-2xl p-6 hover:scale-105 transition-all duration-300 group relative overflow-hidden">
+        <!-- Background Glow -->
+        <div class="absolute inset-0 opacity-20 group-hover:opacity-30 transition-opacity"
+             style="background: radial-gradient(circle at center, {{ char.avatar_color }} 0%, transparent 70%);">
+        </div>
+        
+        <div class="relative z-10">
+            <!-- Avatar -->
+            <div class="w-24 h-24 mx-auto mb-4 rounded-full flex items-center justify-center text-4xl font-bold relative"
+                 style="background: linear-gradient(135deg, {{ char.avatar_color }}dd, {{ char.avatar_color }}88); --avatar-color: {{ char.avatar_color }};">
+                <span class="avatar-glow rounded-full absolute inset-0"></span>
+                <span class="relative">{{ char.name[0] }}</span>
+            </div>
+            
+            <!-- Name & Age -->
+            <h2 class="text-2xl font-bold text-center mb-1">{{ char.name }}</h2>
+            <p class="text-gray-400 text-center mb-4">{{ char.age }} سنة</p>
+            
+            <!-- Mood Badge -->
+            <div class="flex justify-center mb-4">
+                <span class="glass px-3 py-1 rounded-full text-sm flex items-center gap-2">
+                    {% if char.current_mood == 'happy' %}😊
+                    {% elif char.current_mood == 'sad' %}😢
+                    {% elif char.current_mood == 'thoughtful' %}🤔
+                    {% elif char.current_mood == 'playful' %}😜
+                    {% elif char.current_mood == 'anxious' %}😰
+                    {% elif char.current_mood == 'dreamy' %}✨
+                    {% elif char.current_mood == 'contemplative' %}💭
+                    {% else %}😌{% endif %}
+                    {{ char.current_mood }}
+                </span>
+            </div>
+            
+            <!-- Stats -->
+            <div class="space-y-3 mb-6">
+                <div>
+                    <div class="flex justify-between text-sm mb-1">
+                        <span class="text-gray-400">الثقة</span>
+                        <span style="color: {{ char.avatar_color }}">{{ (char.trust_level * 100)|int }}%</span>
+                    </div>
+                    <div class="h-2 bg-white/10 rounded-full overflow-hidden">
+                        <div class="h-full rounded-full transition-all duration-500"
+                             style="width: {{ char.trust_level * 100 }}%; background: {{ char.avatar_color }};">
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <div class="flex justify-between text-sm mb-1">
+                        <span class="text-gray-400">الحميمية</span>
+                        <span style="color: {{ char.avatar_color }}">{{ (char.intimacy_level * 100)|int }}%</span>
+                    </div>
+                    <div class="h-2 bg-white/10 rounded-full overflow-hidden">
+                        <div class="h-full rounded-full transition-all duration-500"
+                             style="width: {{ char.intimacy_level * 100 }}%; background: {{ char.avatar_color }};">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Message Count -->
+            <p class="text-center text-gray-500 text-sm mb-4">
+                {{ char.total_messages }} رسالة
+            </p>
+            
+            <!-- Actions -->
+            <div class="flex gap-2">
+                <a href="/chat/{{ char.id }}" 
+                   class="flex-1 py-3 rounded-xl text-center font-bold transition-all hover:scale-105"
+                   style="background: {{ char.avatar_color }};">
+                    💬 محادثة
+                </a>
+                <a href="/character/{{ char.id }}" 
+                   class="glass px-4 py-3 rounded-xl hover:bg-white/10 transition">
+                    👤
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+    
+    <!-- Create New Character Card -->
+    <a href="/create" class="glass rounded-2xl p-6 hover:scale-105 transition-all duration-300 group relative overflow-hidden flex flex-col items-center justify-center min-h-[400px] border-2 border-dashed border-gray-600 hover:border-purple-500">
+        <div class="text-6xl mb-4 group-hover:scale-110 transition-transform">✨</div>
+        <h2 class="text-2xl font-bold text-center mb-2">إنشاء شخصية جديدة</h2>
+        <p class="text-gray-400 text-center">صمم شخصيتك الخاصة بكل التفاصيل</p>
+    </a>
+</div>
+
+<!-- Features Section -->
+<div class="glass rounded-2xl p-8 mb-8">
+    <h2 class="text-2xl font-bold mb-6 text-center">✨ مميزات روحي</h2>
+    <div class="grid md:grid-cols-4 gap-6">
+        <div class="text-center">
+            <div class="text-4xl mb-3">🧠</div>
+            <h3 class="font-bold mb-2">ذاكرة حقيقية</h3>
+            <p class="text-gray-400 text-sm">يتذكرون كل ما تخبرهم به</p>
+        </div>
+        <div class="text-center">
+            <div class="text-4xl mb-3">🔐</div>
+            <h3 class="font-bold mb-2">أسرار مقفلة</h3>
+            <p class="text-gray-400 text-sm">تُكشف مع بناء الثقة</p>
+        </div>
+        <div class="text-center">
+            <div class="text-4xl mb-3">💭</div>
+            <h3 class="font-bold mb-2">مزاج متغير</h3>
+            <p class="text-gray-400 text-sm">يتأثرون بما تقوله</p>
+        </div>
+        <div class="text-center">
+            <div class="text-4xl mb-3">📔</div>
+            <h3 class="font-bold mb-2">يوميات سرية</h3>
+            <p class="text-gray-400 text-sm">اكتشف أفكارهم الحقيقية</p>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Stats -->
+<div class="glass rounded-xl p-6 text-center">
+    <p class="text-gray-400">
+        إجمالي المحادثات: 
+        <span class="text-purple-400 font-bold">{{ characters|sum(attribute='total_messages') }}</span>
+        رسالة مع 
+        <span class="text-pink-400 font-bold">{{ characters|length }}</span>
+        شخصيات
+    </p>
+</div>
+{% endblock %}

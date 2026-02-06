@@ -1,0 +1,476 @@
+{% extends "base.html" %}
+
+{% block title %}إنشاء شخصية جديدة - روحي{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <!-- Header -->
+    <div class="flex items-center gap-4 mb-8">
+        <a href="/" class="text-gray-400 hover:text-white transition">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+            </svg>
+        </a>
+        <h1 class="text-3xl font-bold">✨ إنشاء شخصية جديدة</h1>
+    </div>
+
+    <form id="createForm" class="space-y-8">
+        
+        <!-- الطبقة 1: الهوية الأساسية -->
+        <div class="card">
+            <h2 class="text-xl font-bold mb-6 flex items-center gap-2">
+                <span class="text-2xl">👤</span>
+                الطبقة 1: الهوية الأساسية
+            </h2>
+            
+            <div class="grid md:grid-cols-2 gap-6">
+                <!-- المعرف -->
+                <div>
+                    <label class="block text-gray-300 mb-2">المعرف (بالإنجليزية) *</label>
+                    <input type="text" name="id" required pattern="[a-z0-9_]+" 
+                           placeholder="مثال: sara, ahmed, nora"
+                           class="w-full bg-gray-700 rounded-lg px-4 py-3 focus:ring-2 focus:ring-purple-500 outline-none">
+                    <p class="text-gray-500 text-sm mt-1">أحرف إنجليزية صغيرة وأرقام فقط</p>
+                </div>
+                
+                <!-- الاسم -->
+                <div>
+                    <label class="block text-gray-300 mb-2">الاسم *</label>
+                    <input type="text" name="name" required placeholder="اسم الشخصية"
+                           class="w-full bg-gray-700 rounded-lg px-4 py-3 focus:ring-2 focus:ring-purple-500 outline-none">
+                </div>
+                
+                <!-- العمر -->
+                <div>
+                    <label class="block text-gray-300 mb-2">العمر *</label>
+                    <input type="number" name="age" required min="18" max="99" value="25"
+                           class="w-full bg-gray-700 rounded-lg px-4 py-3 focus:ring-2 focus:ring-purple-500 outline-none">
+                </div>
+                
+                <!-- الجنس -->
+                <div>
+                    <label class="block text-gray-300 mb-2">الجنس *</label>
+                    <select name="gender" required class="w-full bg-gray-700 rounded-lg px-4 py-3 focus:ring-2 focus:ring-purple-500 outline-none">
+                        <option value="female">أنثى 👩</option>
+                        <option value="male">ذكر 👨</option>
+                        <option value="non_binary">غير محدد 🧑</option>
+                    </select>
+                </div>
+                
+                <!-- الدور/المهنة -->
+                <div>
+                    <label class="block text-gray-300 mb-2">الدور / المهنة *</label>
+                    <input type="text" name="role" required placeholder="مثال: طبيبة، كاتب، فنانة، مهندس..."
+                           class="w-full bg-gray-700 rounded-lg px-4 py-3 focus:ring-2 focus:ring-purple-500 outline-none">
+                </div>
+                
+                <!-- اللون -->
+                <div>
+                    <label class="block text-gray-300 mb-2">اللون المميز</label>
+                    <select name="color" class="w-full bg-gray-700 rounded-lg px-4 py-3 focus:ring-2 focus:ring-purple-500 outline-none">
+                        <option value="pink">وردي 💗</option>
+                        <option value="blue">أزرق 💙</option>
+                        <option value="green">أخضر 💚</option>
+                        <option value="purple">بنفسجي 💜</option>
+                        <option value="red">أحمر ❤️</option>
+                        <option value="yellow">أصفر 💛</option>
+                        <option value="orange">برتقالي 🧡</option>
+                        <option value="cyan">سماوي 🩵</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- الأفاتار/الإيموجي -->
+            <div class="mt-6">
+                <label class="block text-gray-300 mb-2">الأفاتار (إيموجي)</label>
+                <div class="flex flex-wrap gap-3" id="avatarSelector">
+                    <button type="button" class="avatar-btn text-4xl p-2 rounded-lg hover:bg-gray-700 transition" data-avatar="👩">👩</button>
+                    <button type="button" class="avatar-btn text-4xl p-2 rounded-lg hover:bg-gray-700 transition" data-avatar="👨">👨</button>
+                    <button type="button" class="avatar-btn text-4xl p-2 rounded-lg hover:bg-gray-700 transition" data-avatar="👩‍🦰">👩‍🦰</button>
+                    <button type="button" class="avatar-btn text-4xl p-2 rounded-lg hover:bg-gray-700 transition" data-avatar="👨‍🦰">👨‍🦰</button>
+                    <button type="button" class="avatar-btn text-4xl p-2 rounded-lg hover:bg-gray-700 transition" data-avatar="👩‍🦱">👩‍🦱</button>
+                    <button type="button" class="avatar-btn text-4xl p-2 rounded-lg hover:bg-gray-700 transition" data-avatar="👨‍🦱">👨‍🦱</button>
+                    <button type="button" class="avatar-btn text-4xl p-2 rounded-lg hover:bg-gray-700 transition" data-avatar="👩‍🦳">👩‍🦳</button>
+                    <button type="button" class="avatar-btn text-4xl p-2 rounded-lg hover:bg-gray-700 transition" data-avatar="👨‍🦳">👨‍🦳</button>
+                    <button type="button" class="avatar-btn text-4xl p-2 rounded-lg hover:bg-gray-700 transition" data-avatar="🧕">🧕</button>
+                    <button type="button" class="avatar-btn text-4xl p-2 rounded-lg hover:bg-gray-700 transition" data-avatar="👳‍♂️">👳‍♂️</button>
+                    <button type="button" class="avatar-btn text-4xl p-2 rounded-lg hover:bg-gray-700 transition" data-avatar="🧑‍🎨">🧑‍🎨</button>
+                    <button type="button" class="avatar-btn text-4xl p-2 rounded-lg hover:bg-gray-700 transition" data-avatar="🧑‍💼">🧑‍💼</button>
+                    <button type="button" class="avatar-btn text-4xl p-2 rounded-lg hover:bg-gray-700 transition" data-avatar="🧑‍🔬">🧑‍🔬</button>
+                    <button type="button" class="avatar-btn text-4xl p-2 rounded-lg hover:bg-gray-700 transition" data-avatar="🧑‍🎤">🧑‍🎤</button>
+                    <button type="button" class="avatar-btn text-4xl p-2 rounded-lg hover:bg-gray-700 transition" data-avatar="🧙‍♀️">🧙‍♀️</button>
+                    <button type="button" class="avatar-btn text-4xl p-2 rounded-lg hover:bg-gray-700 transition" data-avatar="🧛‍♂️">🧛‍♂️</button>
+                    <button type="button" class="avatar-btn text-4xl p-2 rounded-lg hover:bg-gray-700 transition" data-avatar="🦸‍♀️">🦸‍♀️</button>
+                    <button type="button" class="avatar-btn text-4xl p-2 rounded-lg hover:bg-gray-700 transition" data-avatar="🦹‍♂️">🦹‍♂️</button>
+                </div>
+                <input type="hidden" name="avatar" id="selectedAvatar" value="👩">
+            </div>
+            
+            <!-- الوصف المختصر -->
+            <div class="mt-6">
+                <label class="block text-gray-300 mb-2">الوصف المختصر *</label>
+                <input type="text" name="tagline" required placeholder="وصف قصير يظهر تحت الاسم..."
+                       class="w-full bg-gray-700 rounded-lg px-4 py-3 focus:ring-2 focus:ring-purple-500 outline-none">
+            </div>
+            
+            <!-- السيرة الذاتية -->
+            <div class="mt-6">
+                <label class="block text-gray-300 mb-2">السيرة الذاتية / القصة الخلفية</label>
+                <textarea name="bio" rows="4" placeholder="اكتب قصة خلفية للشخصية... من هي؟ ماذا مرت به؟ ما الذي شكّل شخصيتها؟"
+                          class="w-full bg-gray-700 rounded-lg px-4 py-3 focus:ring-2 focus:ring-purple-500 outline-none resize-none"></textarea>
+            </div>
+        </div>
+
+        <!-- الطبقة 2: الشخصية الظاهرة -->
+        <div class="card">
+            <h2 class="text-xl font-bold mb-6 flex items-center gap-2">
+                <span class="text-2xl">🎭</span>
+                الطبقة 2: الشخصية الظاهرة (Big 5)
+            </h2>
+            
+            <!-- Openness -->
+            <div class="mb-6">
+                <div class="flex justify-between mb-2">
+                    <span class="text-gray-300">الانفتاح على التجارب</span>
+                    <span id="opennessValue" class="text-purple-400">50%</span>
+                </div>
+                <div class="flex items-center gap-4">
+                    <span class="text-sm text-gray-500">تقليدي</span>
+                    <input type="range" name="openness" min="0" max="100" value="50" 
+                           class="flex-1 accent-purple-500" oninput="document.getElementById('opennessValue').textContent = this.value + '%'">
+                    <span class="text-sm text-gray-500">مبدع</span>
+                </div>
+            </div>
+            
+            <!-- Conscientiousness -->
+            <div class="mb-6">
+                <div class="flex justify-between mb-2">
+                    <span class="text-gray-300">الضمير / التنظيم</span>
+                    <span id="conscientiousnessValue" class="text-purple-400">50%</span>
+                </div>
+                <div class="flex items-center gap-4">
+                    <span class="text-sm text-gray-500">عفوي</span>
+                    <input type="range" name="conscientiousness" min="0" max="100" value="50" 
+                           class="flex-1 accent-purple-500" oninput="document.getElementById('conscientiousnessValue').textContent = this.value + '%'">
+                    <span class="text-sm text-gray-500">منظم</span>
+                </div>
+            </div>
+            
+            <!-- Extraversion -->
+            <div class="mb-6">
+                <div class="flex justify-between mb-2">
+                    <span class="text-gray-300">الانبساط</span>
+                    <span id="extraversionValue" class="text-purple-400">50%</span>
+                </div>
+                <div class="flex items-center gap-4">
+                    <span class="text-sm text-gray-500">انطوائي</span>
+                    <input type="range" name="extraversion" min="0" max="100" value="50" 
+                           class="flex-1 accent-purple-500" oninput="document.getElementById('extraversionValue').textContent = this.value + '%'">
+                    <span class="text-sm text-gray-500">اجتماعي</span>
+                </div>
+            </div>
+            
+            <!-- Agreeableness -->
+            <div class="mb-6">
+                <div class="flex justify-between mb-2">
+                    <span class="text-gray-300">الوفاق / التعاون</span>
+                    <span id="agreeablenessValue" class="text-purple-400">50%</span>
+                </div>
+                <div class="flex items-center gap-4">
+                    <span class="text-sm text-gray-500">تنافسي</span>
+                    <input type="range" name="agreeableness" min="0" max="100" value="50" 
+                           class="flex-1 accent-purple-500" oninput="document.getElementById('agreeablenessValue').textContent = this.value + '%'">
+                    <span class="text-sm text-gray-500">متعاون</span>
+                </div>
+            </div>
+            
+            <!-- Neuroticism -->
+            <div class="mb-6">
+                <div class="flex justify-between mb-2">
+                    <span class="text-gray-300">العصابية / الحساسية</span>
+                    <span id="neuroticismValue" class="text-purple-400">50%</span>
+                </div>
+                <div class="flex items-center gap-4">
+                    <span class="text-sm text-gray-500">مستقر</span>
+                    <input type="range" name="neuroticism" min="0" max="100" value="50" 
+                           class="flex-1 accent-purple-500" oninput="document.getElementById('neuroticismValue').textContent = this.value + '%'">
+                    <span class="text-sm text-gray-500">حساس</span>
+                </div>
+            </div>
+            
+            <!-- أسلوب التواصل -->
+            <div class="mt-8">
+                <label class="block text-gray-300 mb-3">أسلوب التواصل</label>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    <label class="flex items-center gap-2 bg-gray-700 rounded-lg p-3 cursor-pointer hover:bg-gray-600 transition">
+                        <input type="checkbox" name="style_romantic" class="accent-purple-500">
+                        <span>رومانسي 💕</span>
+                    </label>
+                    <label class="flex items-center gap-2 bg-gray-700 rounded-lg p-3 cursor-pointer hover:bg-gray-600 transition">
+                        <input type="checkbox" name="style_sarcastic" class="accent-purple-500">
+                        <span>ساخر 😏</span>
+                    </label>
+                    <label class="flex items-center gap-2 bg-gray-700 rounded-lg p-3 cursor-pointer hover:bg-gray-600 transition">
+                        <input type="checkbox" name="style_philosophical" class="accent-purple-500">
+                        <span>فلسفي 🤔</span>
+                    </label>
+                    <label class="flex items-center gap-2 bg-gray-700 rounded-lg p-3 cursor-pointer hover:bg-gray-600 transition">
+                        <input type="checkbox" name="style_playful" class="accent-purple-500">
+                        <span>مرح 😄</span>
+                    </label>
+                    <label class="flex items-center gap-2 bg-gray-700 rounded-lg p-3 cursor-pointer hover:bg-gray-600 transition">
+                        <input type="checkbox" name="style_caring" class="accent-purple-500">
+                        <span>حنون 🤗</span>
+                    </label>
+                    <label class="flex items-center gap-2 bg-gray-700 rounded-lg p-3 cursor-pointer hover:bg-gray-600 transition">
+                        <input type="checkbox" name="style_mysterious" class="accent-purple-500">
+                        <span>غامض 🌙</span>
+                    </label>
+                    <label class="flex items-center gap-2 bg-gray-700 rounded-lg p-3 cursor-pointer hover:bg-gray-600 transition">
+                        <input type="checkbox" name="style_intellectual" class="accent-purple-500">
+                        <span>فكري 📚</span>
+                    </label>
+                    <label class="flex items-center gap-2 bg-gray-700 rounded-lg p-3 cursor-pointer hover:bg-gray-600 transition">
+                        <input type="checkbox" name="style_passionate" class="accent-purple-500">
+                        <span>عاطفي 🔥</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- الطبقة 3: العالم الداخلي -->
+        <div class="card">
+            <h2 class="text-xl font-bold mb-6 flex items-center gap-2">
+                <span class="text-2xl">💭</span>
+                الطبقة 3: العالم الداخلي
+            </h2>
+            
+            <!-- المخاوف -->
+            <div class="mb-6">
+                <label class="block text-gray-300 mb-2">المخاوف العميقة (3 مخاوف)</label>
+                <input type="text" name="fear1" placeholder="الخوف الأول..." class="w-full bg-gray-700 rounded-lg px-4 py-3 mb-2 focus:ring-2 focus:ring-purple-500 outline-none">
+                <input type="text" name="fear2" placeholder="الخوف الثاني..." class="w-full bg-gray-700 rounded-lg px-4 py-3 mb-2 focus:ring-2 focus:ring-purple-500 outline-none">
+                <input type="text" name="fear3" placeholder="الخوف الثالث..." class="w-full bg-gray-700 rounded-lg px-4 py-3 focus:ring-2 focus:ring-purple-500 outline-none">
+            </div>
+            
+            <!-- الأحلام -->
+            <div class="mb-6">
+                <label class="block text-gray-300 mb-2">الأحلام والطموحات</label>
+                <textarea name="dreams" rows="3" placeholder="ما الذي تحلم به هذه الشخصية؟ ما الذي تريده حقاً في الحياة؟"
+                          class="w-full bg-gray-700 rounded-lg px-4 py-3 focus:ring-2 focus:ring-purple-500 outline-none resize-none"></textarea>
+            </div>
+            
+            <!-- الجروح -->
+            <div class="mb-6">
+                <label class="block text-gray-300 mb-2">الجروح القديمة</label>
+                <textarea name="wounds" rows="3" placeholder="ما الأحداث المؤلمة في ماضيها؟ ما الذي شكّل دفاعاتها النفسية؟"
+                          class="w-full bg-gray-700 rounded-lg px-4 py-3 focus:ring-2 focus:ring-purple-500 outline-none resize-none"></textarea>
+            </div>
+            
+            <!-- القيم -->
+            <div class="mb-6">
+                <label class="block text-gray-300 mb-2">القيم الثابتة</label>
+                <textarea name="values" rows="2" placeholder="ما المبادئ التي لا تتنازل عنها أبداً؟"
+                          class="w-full bg-gray-700 rounded-lg px-4 py-3 focus:ring-2 focus:ring-purple-500 outline-none resize-none"></textarea>
+            </div>
+            
+            <!-- نقطة الانكسار -->
+            <div>
+                <label class="block text-gray-300 mb-2">نقطة الانكسار 💔</label>
+                <input type="text" name="breaking_point" placeholder="ما الذي يمكن أن يجعلها تنهار تماماً؟"
+                       class="w-full bg-gray-700 rounded-lg px-4 py-3 focus:ring-2 focus:ring-purple-500 outline-none">
+            </div>
+        </div>
+
+        <!-- الطبقة 4: الأسرار المقفلة -->
+        <div class="card">
+            <h2 class="text-xl font-bold mb-6 flex items-center gap-2">
+                <span class="text-2xl">🔐</span>
+                الطبقة 4: الأسرار المقفلة
+            </h2>
+            <p class="text-gray-400 mb-6">هذه الأسرار ستُكشف تدريجياً مع بناء الثقة</p>
+            
+            <div class="space-y-4">
+                <div class="bg-gray-700/50 rounded-lg p-4">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="bg-green-500/20 text-green-400 px-2 py-1 rounded text-sm">30% ثقة</span>
+                        <span class="text-gray-300">السر الأول</span>
+                    </div>
+                    <textarea name="secret1" rows="2" placeholder="سر بسيط يُكشف مبكراً..."
+                              class="w-full bg-gray-700 rounded-lg px-4 py-3 focus:ring-2 focus:ring-purple-500 outline-none resize-none"></textarea>
+                </div>
+                
+                <div class="bg-gray-700/50 rounded-lg p-4">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="bg-yellow-500/20 text-yellow-400 px-2 py-1 rounded text-sm">50% ثقة</span>
+                        <span class="text-gray-300">السر الثاني</span>
+                    </div>
+                    <textarea name="secret2" rows="2" placeholder="سر أعمق قليلاً..."
+                              class="w-full bg-gray-700 rounded-lg px-4 py-3 focus:ring-2 focus:ring-purple-500 outline-none resize-none"></textarea>
+                </div>
+                
+                <div class="bg-gray-700/50 rounded-lg p-4">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="bg-orange-500/20 text-orange-400 px-2 py-1 rounded text-sm">70% ثقة</span>
+                        <span class="text-gray-300">السر الثالث</span>
+                    </div>
+                    <textarea name="secret3" rows="2" placeholder="سر مؤثر..."
+                              class="w-full bg-gray-700 rounded-lg px-4 py-3 focus:ring-2 focus:ring-purple-500 outline-none resize-none"></textarea>
+                </div>
+                
+                <div class="bg-gray-700/50 rounded-lg p-4">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="bg-red-500/20 text-red-400 px-2 py-1 rounded text-sm">90% ثقة</span>
+                        <span class="text-gray-300">السر الأعمق</span>
+                    </div>
+                    <textarea name="secret4" rows="2" placeholder="السر الأكثر خصوصية... لا يُكشف إلا لمن تثق به تماماً"
+                              class="w-full bg-gray-700 rounded-lg px-4 py-3 focus:ring-2 focus:ring-purple-500 outline-none resize-none"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- الطبقة 5: الوعي والسلوك -->
+        <div class="card">
+            <h2 class="text-xl font-bold mb-6 flex items-center gap-2">
+                <span class="text-2xl">🧠</span>
+                الطبقة 5: الوعي والسلوك
+            </h2>
+            
+            <!-- هل تعرف أنها AI -->
+            <div class="mb-6">
+                <label class="flex items-center gap-3 cursor-pointer">
+                    <input type="checkbox" name="knows_is_ai" class="w-5 h-5 accent-purple-500">
+                    <span class="text-gray-300">الشخصية تعرف أنها AI (تتحدث عن كونها ذكاء اصطناعي)</span>
+                </label>
+            </div>
+            
+            <!-- المزاج الافتراضي -->
+            <div class="mb-6">
+                <label class="block text-gray-300 mb-2">المزاج الافتراضي</label>
+                <select name="default_mood" class="w-full bg-gray-700 rounded-lg px-4 py-3 focus:ring-2 focus:ring-purple-500 outline-none">
+                    <option value="happy">سعيد 😊</option>
+                    <option value="calm">هادئ 😌</option>
+                    <option value="thoughtful">متأمل 🤔</option>
+                    <option value="playful">مرح 😄</option>
+                    <option value="romantic">رومانسي 🥰</option>
+                    <option value="melancholic">حزين قليلاً 😢</option>
+                    <option value="mysterious">غامض 🌙</option>
+                    <option value="energetic">نشيط ⚡</option>
+                </select>
+            </div>
+            
+            <!-- طريقة الكلام -->
+            <div class="mb-6">
+                <label class="block text-gray-300 mb-2">طريقة الكلام المميزة</label>
+                <textarea name="speech_pattern" rows="2" placeholder="مثال: تستخدم كلمات معينة كثيراً، لهجة معينة، تبدأ جملها بطريقة مميزة..."
+                          class="w-full bg-gray-700 rounded-lg px-4 py-3 focus:ring-2 focus:ring-purple-500 outline-none resize-none"></textarea>
+            </div>
+            
+            <!-- الاهتمامات -->
+            <div>
+                <label class="block text-gray-300 mb-2">الاهتمامات والهوايات</label>
+                <input type="text" name="interests" placeholder="مثال: القراءة، الموسيقى، السفر، الفن..."
+                       class="w-full bg-gray-700 rounded-lg px-4 py-3 focus:ring-2 focus:ring-purple-500 outline-none">
+            </div>
+        </div>
+
+        <!-- زر الإنشاء -->
+        <div class="flex gap-4">
+            <button type="submit" class="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold py-4 px-8 rounded-xl transition transform hover:scale-[1.02]">
+                ✨ إنشاء الشخصية
+            </button>
+            <a href="/" class="bg-gray-700 hover:bg-gray-600 text-white font-bold py-4 px-8 rounded-xl transition text-center">
+                إلغاء
+            </a>
+        </div>
+    </form>
+</div>
+
+<script>
+// Avatar selector
+document.querySelectorAll('.avatar-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('.avatar-btn').forEach(b => b.classList.remove('bg-purple-600'));
+        this.classList.add('bg-purple-600');
+        document.getElementById('selectedAvatar').value = this.dataset.avatar;
+    });
+});
+
+// Form submission
+document.getElementById('createForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    
+    // Build character data
+    const data = {
+        id: formData.get('id'),
+        name: formData.get('name'),
+        age: parseInt(formData.get('age')),
+        gender: formData.get('gender'),
+        role: formData.get('role'),
+        color: formData.get('color'),
+        avatar: formData.get('avatar'),
+        tagline: formData.get('tagline'),
+        bio: formData.get('bio') || '',
+        
+        personality: {
+            openness: parseInt(formData.get('openness')),
+            conscientiousness: parseInt(formData.get('conscientiousness')),
+            extraversion: parseInt(formData.get('extraversion')),
+            agreeableness: parseInt(formData.get('agreeableness')),
+            neuroticism: parseInt(formData.get('neuroticism'))
+        },
+        
+        communication_style: {
+            romantic: formData.get('style_romantic') === 'on',
+            sarcastic: formData.get('style_sarcastic') === 'on',
+            philosophical: formData.get('style_philosophical') === 'on',
+            playful: formData.get('style_playful') === 'on',
+            caring: formData.get('style_caring') === 'on',
+            mysterious: formData.get('style_mysterious') === 'on',
+            intellectual: formData.get('style_intellectual') === 'on',
+            passionate: formData.get('style_passionate') === 'on'
+        },
+        
+        inner_world: {
+            fears: [formData.get('fear1'), formData.get('fear2'), formData.get('fear3')].filter(f => f),
+            dreams: formData.get('dreams') || '',
+            wounds: formData.get('wounds') || '',
+            values: formData.get('values') || '',
+            breaking_point: formData.get('breaking_point') || ''
+        },
+        
+        secrets: [
+            { level: 30, content: formData.get('secret1') || '' },
+            { level: 50, content: formData.get('secret2') || '' },
+            { level: 70, content: formData.get('secret3') || '' },
+            { level: 90, content: formData.get('secret4') || '' }
+        ],
+        
+        knows_is_ai: formData.get('knows_is_ai') === 'on',
+        default_mood: formData.get('default_mood'),
+        speech_pattern: formData.get('speech_pattern') || '',
+        interests: formData.get('interests') || ''
+    };
+    
+    try {
+        const response = await fetch('/api/character/create', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            window.location.href = '/character/' + data.id;
+        } else {
+            alert('خطأ: ' + result.error);
+        }
+    } catch (error) {
+        alert('حدث خطأ في الاتصال');
+    }
+});
+</script>
+{% endblock %}

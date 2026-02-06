@@ -1,0 +1,318 @@
+{% extends "base.html" %}
+
+{% block title %}محادثة مع {{ character.name }} - روحي{% endblock %}
+
+{% block head %}
+<style>
+    .messages-container {
+        height: calc(100vh - 350px);
+        min-height: 400px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <!-- Character Header -->
+    <div class="glass rounded-2xl p-6 mb-6">
+        <div class="flex items-center gap-6">
+            <!-- Avatar -->
+            <div class="w-20 h-20 rounded-full flex items-center justify-center text-3xl font-bold relative shrink-0"
+                 style="background: linear-gradient(135deg, {{ character.avatar_color }}dd, {{ character.avatar_color }}88);">
+                {{ character.name[0] }}
+                <!-- Online indicator -->
+                <span class="absolute bottom-1 right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-gray-900"></span>
+            </div>
+            
+            <div class="flex-1">
+                <div class="flex items-center gap-3 mb-2">
+                    <h1 class="text-2xl font-bold">{{ character.name }}</h1>
+                    <span class="glass px-3 py-1 rounded-full text-sm" id="mood-badge">
+                        {% if character.current_mood == 'happy' %}😊 سعيد
+                        {% elif character.current_mood == 'sad' %}😢 حزين
+                        {% elif character.current_mood == 'thoughtful' %}🤔 متأمل
+                        {% elif character.current_mood == 'playful' %}😜 مرح
+                        {% elif character.current_mood == 'anxious' %}😰 قلق
+                        {% elif character.current_mood == 'dreamy' %}✨ حالم
+                        {% elif character.current_mood == 'contemplative' %}💭 تأملي
+                        {% elif character.current_mood == 'melancholic' %}🌧️ كئيب
+                        {% else %}😌 هادئ{% endif %}
+                    </span>
+                </div>
+                
+                <!-- Stats Bar -->
+                <div class="flex gap-6">
+                    <div class="flex items-center gap-2">
+                        <span class="text-gray-400 text-sm">الثقة:</span>
+                        <div class="w-24 h-2 bg-white/10 rounded-full overflow-hidden">
+                            <div id="trust-bar" class="h-full rounded-full transition-all duration-500"
+                                 style="width: {{ character.trust_level * 100 }}%; background: {{ character.avatar_color }};"></div>
+                        </div>
+                        <span id="trust-value" class="text-sm" style="color: {{ character.avatar_color }}">{{ (character.trust_level * 100)|int }}%</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-gray-400 text-sm">الحميمية:</span>
+                        <div class="w-24 h-2 bg-white/10 rounded-full overflow-hidden">
+                            <div id="intimacy-bar" class="h-full rounded-full transition-all duration-500"
+                                 style="width: {{ character.intimacy_level * 100 }}%; background: {{ character.avatar_color }};"></div>
+                        </div>
+                        <span id="intimacy-value" class="text-sm" style="color: {{ character.avatar_color }}">{{ (character.intimacy_level * 100)|int }}%</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quick Actions -->
+            <div class="flex gap-2">
+                <a href="/character/{{ character.id }}" class="glass p-3 rounded-xl hover:bg-white/10 transition" title="الملف الشخصي">
+                    👤
+                </a>
+                <a href="/diary/{{ character.id }}" class="glass p-3 rounded-xl hover:bg-white/10 transition" title="اليوميات">
+                    📔
+                </a>
+                <a href="/edit/{{ character.id }}" class="glass p-3 rounded-xl hover:bg-white/10 transition" title="تعديل">
+                    ✏️
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Messages Container -->
+    <div class="glass rounded-2xl p-6 mb-6">
+        <div id="messages" class="messages-container overflow-y-auto space-y-4 mb-4 scroll-smooth">
+            {% if not messages %}
+            <div class="text-center text-gray-400 py-12">
+                <div class="text-6xl mb-4">💜</div>
+                <p class="text-xl mb-2">ابدأ المحادثة مع {{ character.name }}</p>
+                <p class="text-sm">كل ما تقوله سيُذكر وسيؤثر على العلاقة بينكما</p>
+            </div>
+            {% else %}
+                {% for msg in messages %}
+                <div class="flex {% if msg.role == 'user' %}justify-end{% else %}justify-start{% endif %} fade-in">
+                    {% if msg.role == 'assistant' %}
+                    <div class="w-10 h-10 rounded-full flex items-center justify-center text-lg shrink-0 ml-3"
+                         style="background: {{ character.avatar_color }};">
+                        {{ character.name[0] }}
+                    </div>
+                    {% endif %}
+                    
+                    <div class="max-w-[70%] {% if msg.role == 'user' %}chat-bubble-user{% else %}chat-bubble-ai{% endif %} rounded-2xl px-5 py-3">
+                        <p class="whitespace-pre-wrap">{{ msg.content }}</p>
+                        <span class="text-xs opacity-50 mt-1 block">{{ msg.created_at[:16] }}</span>
+                    </div>
+                    
+                    {% if msg.role == 'user' %}
+                    <div class="w-10 h-10 rounded-full bg-purple-600 flex items-center justify-center text-lg shrink-0 mr-3">
+                        أنت
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+        
+        <!-- Typing Indicator -->
+        <div id="typing-indicator" class="hidden flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 rounded-full flex items-center justify-center text-lg"
+                 style="background: {{ character.avatar_color }};">
+                {{ character.name[0] }}
+            </div>
+            <div class="glass rounded-2xl px-5 py-3">
+                <div class="typing-indicator flex gap-1">
+                    <span class="w-2 h-2 rounded-full bg-white"></span>
+                    <span class="w-2 h-2 rounded-full bg-white"></span>
+                    <span class="w-2 h-2 rounded-full bg-white"></span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Input Area -->
+        <form id="chat-form" class="flex gap-3">
+            <input type="text" 
+                   id="message-input"
+                   placeholder="اكتب رسالتك..."
+                   class="flex-1 bg-white/5 border border-white/10 rounded-xl px-5 py-4 focus:outline-none focus:border-purple-500 transition"
+                   autocomplete="off">
+            <button type="submit" 
+                    class="px-8 py-4 rounded-xl font-bold transition-all hover:scale-105 disabled:opacity-50 disabled:hover:scale-100"
+                    style="background: {{ character.avatar_color }};"
+                    id="send-btn">
+                إرسال ➤
+            </button>
+        </form>
+    </div>
+    
+    <!-- Secret Reveal Modal -->
+    <div id="secret-modal" class="fixed inset-0 bg-black/80 z-50 hidden items-center justify-center">
+        <div class="glass rounded-2xl p-8 max-w-lg mx-4 secret-reveal">
+            <div class="text-center">
+                <div class="text-6xl mb-4">🔓</div>
+                <h2 class="text-2xl font-bold mb-2 text-purple-400">{{ character.name }} كشف/ت سراً!</h2>
+                <p id="secret-content" class="text-lg mb-6 text-gray-300"></p>
+                <button onclick="closeSecretModal()" class="px-8 py-3 rounded-xl font-bold" style="background: {{ character.avatar_color }};">
+                    حسناً
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const characterId = '{{ character.id }}';
+    const avatarColor = '{{ character.avatar_color }}';
+    const characterName = '{{ character.name }}';
+    const characterInitial = '{{ character.name[0] }}';
+    
+    const messagesContainer = document.getElementById('messages');
+    const messageInput = document.getElementById('message-input');
+    const chatForm = document.getElementById('chat-form');
+    const typingIndicator = document.getElementById('typing-indicator');
+    const sendBtn = document.getElementById('send-btn');
+    
+    // Scroll to bottom
+    function scrollToBottom() {
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+    scrollToBottom();
+    
+    // Add message to UI
+    function addMessage(content, role, timestamp = null) {
+        const time = timestamp || new Date().toISOString().slice(0, 16);
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `flex ${role === 'user' ? 'justify-end' : 'justify-start'} fade-in`;
+        
+        if (role === 'user') {
+            messageDiv.innerHTML = `
+                <div class="max-w-[70%] chat-bubble-user rounded-2xl px-5 py-3">
+                    <p class="whitespace-pre-wrap">${escapeHtml(content)}</p>
+                    <span class="text-xs opacity-50 mt-1 block">${time}</span>
+                </div>
+                <div class="w-10 h-10 rounded-full bg-purple-600 flex items-center justify-center text-lg shrink-0 mr-3">
+                    أنت
+                </div>
+            `;
+        } else {
+            messageDiv.innerHTML = `
+                <div class="w-10 h-10 rounded-full flex items-center justify-center text-lg shrink-0 ml-3"
+                     style="background: ${avatarColor};">
+                    ${characterInitial}
+                </div>
+                <div class="max-w-[70%] chat-bubble-ai rounded-2xl px-5 py-3">
+                    <p class="whitespace-pre-wrap">${escapeHtml(content)}</p>
+                    <span class="text-xs opacity-50 mt-1 block">${time}</span>
+                </div>
+            `;
+        }
+        
+        messagesContainer.appendChild(messageDiv);
+        scrollToBottom();
+    }
+    
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+    
+    // Update stats
+    function updateStats(trust, intimacy, mood) {
+        document.getElementById('trust-bar').style.width = trust + '%';
+        document.getElementById('trust-value').textContent = trust + '%';
+        document.getElementById('intimacy-bar').style.width = intimacy + '%';
+        document.getElementById('intimacy-value').textContent = intimacy + '%';
+        
+        const moodEmojis = {
+            'happy': '😊 سعيد',
+            'sad': '😢 حزين',
+            'thoughtful': '🤔 متأمل',
+            'playful': '😜 مرح',
+            'anxious': '😰 قلق',
+            'dreamy': '✨ حالم',
+            'contemplative': '💭 تأملي',
+            'melancholic': '🌧️ كئيب',
+            'neutral': '😌 هادئ',
+            'calm': '😌 هادئ',
+            'excited': '🤩 متحمس'
+        };
+        document.getElementById('mood-badge').textContent = moodEmojis[mood] || '😌 ' + mood;
+    }
+    
+    // Show secret modal
+    function showSecretModal(secret) {
+        document.getElementById('secret-content').textContent = secret;
+        document.getElementById('secret-modal').classList.remove('hidden');
+        document.getElementById('secret-modal').classList.add('flex');
+    }
+    
+    function closeSecretModal() {
+        document.getElementById('secret-modal').classList.add('hidden');
+        document.getElementById('secret-modal').classList.remove('flex');
+    }
+    
+    // Send message
+    chatForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const message = messageInput.value.trim();
+        if (!message) return;
+        
+        // Clear input and disable
+        messageInput.value = '';
+        sendBtn.disabled = true;
+        
+        // Add user message
+        addMessage(message, 'user');
+        
+        // Show typing indicator
+        typingIndicator.classList.remove('hidden');
+        scrollToBottom();
+        
+        try {
+            const response = await fetch('/api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    character_id: characterId,
+                    message: message
+                })
+            });
+            
+            const data = await response.json();
+            
+            // Hide typing
+            typingIndicator.classList.add('hidden');
+            
+            if (data.error) {
+                showToast(data.error, 'error');
+                return;
+            }
+            
+            // Add AI response
+            addMessage(data.response, 'assistant');
+            
+            // Update stats
+            updateStats(data.trust, data.intimacy, data.mood);
+            
+            // Show revealed secrets
+            if (data.newly_revealed_secrets && data.newly_revealed_secrets.length > 0) {
+                setTimeout(() => {
+                    data.newly_revealed_secrets.forEach(secret => {
+                        showSecretModal(secret);
+                    });
+                }, 500);
+            }
+            
+        } catch (error) {
+            typingIndicator.classList.add('hidden');
+            showToast('حدث خطأ في الاتصال', 'error');
+        } finally {
+            sendBtn.disabled = false;
+            messageInput.focus();
+        }
+    });
+    
+    // Focus input on load
+    messageInput.focus();
+</script>
+{% endblock %}

@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block title %}يوميات {{ character.name }} - روحي{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto">
+    <!-- Header -->
+    <div class="glass rounded-2xl p-6 mb-6">
+        <div class="flex items-center gap-6">
+            <div class="w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold"
+                 style="background: {{ character.avatar_color }};">
+                {{ character.name[0] }}
+            </div>
+            <div class="flex-1">
+                <h1 class="text-2xl font-bold">📔 يوميات {{ character.name }}</h1>
+                <p class="text-gray-400">اكتشف أفكارها الخاصة عنك وعن حياتها</p>
+            </div>
+            <div class="flex gap-2">
+                <a href="/chat/{{ character.id }}" class="glass px-4 py-2 rounded-xl hover:bg-white/10">💬</a>
+                <a href="/character/{{ character.id }}" class="glass px-4 py-2 rounded-xl hover:bg-white/10">👤</a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Generate New Entry -->
+    <div class="glass rounded-2xl p-6 mb-6 text-center">
+        <p class="text-gray-400 mb-4">اطلب من {{ character.name }} كتابة مدخل جديد في يومياتها</p>
+        <button onclick="generateDiary()" id="generate-btn"
+                class="px-8 py-3 rounded-xl font-bold transition hover:scale-105"
+                style="background: {{ character.avatar_color }};">
+            ✨ توليد مدخل جديد
+        </button>
+    </div>
+    
+    <!-- Diary Entries -->
+    <div id="entries-container" class="space-y-4">
+        {% if entries %}
+            {% for entry in entries %}
+            <div class="glass rounded-2xl p-6 fade-in">
+                <div class="flex items-start gap-4">
+                    <div class="text-3xl">📝</div>
+                    <div class="flex-1">
+                        <div class="flex items-center gap-3 mb-3">
+                            <span class="text-sm text-gray-400">{{ entry.created_at[:16] }}</span>
+                            {% if entry.mood %}
+                            <span class="glass px-2 py-1 rounded text-xs">{{ entry.mood }}</span>
+                            {% endif %}
+                        </div>
+                        <p class="text-gray-200 whitespace-pre-line leading-relaxed">{{ entry.content }}</p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+        <div class="text-center py-12 text-gray-400">
+            <div class="text-6xl mb-4">📔</div>
+            <p class="text-xl mb-2">لا توجد مدخلات بعد</p>
+            <p class="text-sm">اطلب من {{ character.name }} كتابة أفكارها</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    async function generateDiary() {
+        const btn = document.getElementById('generate-btn');
+        btn.disabled = true;
+        btn.textContent = '⏳ جاري الكتابة...';
+        
+        try {
+            const response = await fetch('/api/diary/generate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ character_id: '{{ character.id }}' })
+            });
+            
+            const data = await response.json();
+            
+            // Add new entry to top
+            const container = document.getElementById('entries-container');
+            const emptyState = container.querySelector('.text-center.py-12');
+            if (emptyState) emptyState.remove();
+            
+            const entryHtml = `
+                <div class="glass rounded-2xl p-6 fade-in">
+                    <div class="flex items-start gap-4">
+                        <div class="text-3xl">📝</div>
+                        <div class="flex-1">
+                            <div class="flex items-center gap-3 mb-3">
+                                <span class="text-sm text-gray-400">${new Date().toISOString().slice(0, 16)}</span>
+                                <span class="glass px-2 py-1 rounded text-xs">${data.mood}</span>
+                            </div>
+                            <p class="text-gray-200 whitespace-pre-line leading-relaxed">${data.content}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            container.insertAdjacentHTML('afterbegin', entryHtml);
+            showToast('تمت كتابة مدخل جديد!', 'success');
+            
+        } catch (error) {
+            showToast('حدث خطأ', 'error');
+        } finally {
+            btn.disabled = false;
+            btn.textContent = '✨ توليد مدخل جديد';
+        }
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,280 @@
+{% extends "base.html" %}
+
+{% block title %}{{ character.name }} - روحي{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <!-- Hero Section -->
+    <div class="glass rounded-2xl p-8 mb-6 relative overflow-hidden">
+        <div class="absolute inset-0 opacity-20"
+             style="background: radial-gradient(circle at top right, {{ character.avatar_color }} 0%, transparent 60%);"></div>
+        
+        <div class="relative z-10 flex flex-col md:flex-row items-center gap-8">
+            <!-- Avatar -->
+            <div class="w-32 h-32 rounded-full flex items-center justify-center text-5xl font-bold"
+                 style="background: linear-gradient(135deg, {{ character.avatar_color }}dd, {{ character.avatar_color }}88);">
+                {{ character.name[0] }}
+            </div>
+            
+            <div class="flex-1 text-center md:text-right">
+                <h1 class="text-4xl font-bold mb-2">{{ character.name }}</h1>
+                <p class="text-xl text-gray-400 mb-4">{{ character.age }} سنة • {{ character.gender }}</p>
+                
+                <!-- Quick Stats -->
+                <div class="flex flex-wrap justify-center md:justify-start gap-4">
+                    <div class="glass px-4 py-2 rounded-full">
+                        💬 {{ character.total_messages }} رسالة
+                    </div>
+                    <div class="glass px-4 py-2 rounded-full">
+                        🔐 {{ character.revealed_count }}/{{ character.total_secrets }} أسرار
+                    </div>
+                    <div class="glass px-4 py-2 rounded-full">
+                        💜 {{ (character.trust_level * 100)|int }}% ثقة
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Actions -->
+            <div class="flex flex-col gap-2">
+                <div class="flex gap-2">
+                    <a href="/chat/{{ character.id }}" 
+                       class="px-6 py-3 rounded-xl font-bold"
+                       style="background: {{ character.avatar_color }};">
+                        💬 محادثة
+                    </a>
+                    <a href="/edit/{{ character.id }}" 
+                       class="glass px-6 py-3 rounded-xl hover:bg-white/10">
+                        ✏️ تعديل
+                    </a>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="duplicateCharacter('{{ character.id }}')" 
+                            class="glass px-4 py-2 rounded-xl hover:bg-white/10 text-sm">
+                        📋 نسخ
+                    </button>
+                    <button onclick="deleteCharacter('{{ character.id }}', '{{ character.name }}')" 
+                            class="glass px-4 py-2 rounded-xl hover:bg-red-500/20 text-red-400 text-sm">
+                        🗑️ حذف
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="grid md:grid-cols-2 gap-6 mb-6">
+        <!-- Backstory -->
+        <div class="glass rounded-2xl p-6">
+            <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+                <span>📖</span> القصة
+            </h2>
+            <p class="text-gray-300 leading-relaxed whitespace-pre-line">{{ character.backstory }}</p>
+        </div>
+        
+        <!-- Personality -->
+        <div class="glass rounded-2xl p-6">
+            <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+                <span>🎭</span> الشخصية
+            </h2>
+            
+            <div class="space-y-4">
+                <div>
+                    <div class="flex justify-between text-sm mb-1">
+                        <span>الانفتاح</span>
+                        <span>{{ (character.personality_openness * 100)|int }}%</span>
+                    </div>
+                    <div class="h-2 bg-white/10 rounded-full">
+                        <div class="h-full rounded-full" style="width: {{ character.personality_openness * 100 }}%; background: {{ character.avatar_color }};"></div>
+                    </div>
+                </div>
+                <div>
+                    <div class="flex justify-between text-sm mb-1">
+                        <span>الضمير</span>
+                        <span>{{ (character.personality_conscientiousness * 100)|int }}%</span>
+                    </div>
+                    <div class="h-2 bg-white/10 rounded-full">
+                        <div class="h-full rounded-full" style="width: {{ character.personality_conscientiousness * 100 }}%; background: {{ character.avatar_color }};"></div>
+                    </div>
+                </div>
+                <div>
+                    <div class="flex justify-between text-sm mb-1">
+                        <span>الانبساط</span>
+                        <span>{{ (character.personality_extraversion * 100)|int }}%</span>
+                    </div>
+                    <div class="h-2 bg-white/10 rounded-full">
+                        <div class="h-full rounded-full" style="width: {{ character.personality_extraversion * 100 }}%; background: {{ character.avatar_color }};"></div>
+                    </div>
+                </div>
+                <div>
+                    <div class="flex justify-between text-sm mb-1">
+                        <span>الوفاق</span>
+                        <span>{{ (character.personality_agreeableness * 100)|int }}%</span>
+                    </div>
+                    <div class="h-2 bg-white/10 rounded-full">
+                        <div class="h-full rounded-full" style="width: {{ character.personality_agreeableness * 100 }}%; background: {{ character.avatar_color }};"></div>
+                    </div>
+                </div>
+                <div>
+                    <div class="flex justify-between text-sm mb-1">
+                        <span>الحساسية</span>
+                        <span>{{ (character.personality_neuroticism * 100)|int }}%</span>
+                    </div>
+                    <div class="h-2 bg-white/10 rounded-full">
+                        <div class="h-full rounded-full" style="width: {{ character.personality_neuroticism * 100 }}%; background: {{ character.avatar_color }};"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-4 pt-4 border-t border-white/10">
+                <p class="text-sm text-gray-400">
+                    <strong>أسلوب التواصل:</strong> {{ character.communication_style }}<br>
+                    <strong>نبرة الكلام:</strong> {{ character.speaking_tone }}<br>
+                    <strong>الفكاهة:</strong> {{ (character.humor_level * 100)|int }}%
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Inner World -->
+    <div class="glass rounded-2xl p-6 mb-6">
+        <h2 class="text-xl font-bold mb-6 flex items-center gap-2">
+            <span>💭</span> العالم الداخلي
+        </h2>
+        
+        <div class="grid md:grid-cols-2 gap-6" id="inner-world">
+            <!-- Will be populated by JavaScript -->
+        </div>
+        
+        <div class="mt-6 pt-6 border-t border-white/10">
+            <h3 class="font-bold mb-2 text-red-500">💥 نقطة الانكسار</h3>
+            <p class="text-gray-300 glass px-4 py-3 rounded-lg">{{ character.breaking_point }}</p>
+        </div>
+    </div>
+    
+    <!-- Revealed Secrets -->
+    <div class="glass rounded-2xl p-6 mb-6">
+        <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+            <span>🔓</span> الأسرار المكشوفة ({{ character.revealed_count }}/{{ character.total_secrets }})
+        </h2>
+        
+        {% if character.revealed_secrets %}
+        <div class="space-y-3">
+            {% for secret in character.revealed_secrets %}
+            <div class="glass px-4 py-3 rounded-lg border-r-4" style="border-color: {{ character.avatar_color }};">
+                <p class="text-gray-300">{{ secret.secret }}</p>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-8 text-gray-400">
+            <div class="text-4xl mb-2">🔐</div>
+            <p>لم تُكشف أي أسرار بعد</p>
+            <p class="text-sm">استمر في المحادثة لبناء الثقة</p>
+        </div>
+        {% endif %}
+        
+        {% if character.revealed_count < character.total_secrets %}
+        <div class="mt-4 pt-4 border-t border-white/10 text-center text-gray-400">
+            <p>🔐 {{ character.total_secrets - character.revealed_count }} أسرار متبقية...</p>
+            <p class="text-sm">الثقة الحالية: {{ (character.trust_level * 100)|int }}%</p>
+        </div>
+        {% endif %}
+    </div>
+    
+    <!-- Danger Zone -->
+    <div class="glass rounded-2xl p-6 border border-red-500/30">
+        <h2 class="text-xl font-bold mb-4 text-red-400">⚠️ منطقة الخطر</h2>
+        <p class="text-gray-400 mb-4">إعادة تعيين العلاقة سيحذف جميع المحادثات والذكريات والأسرار المكشوفة.</p>
+        <button onclick="confirmReset()" class="px-6 py-3 bg-red-500/20 text-red-400 rounded-xl hover:bg-red-500/30 transition">
+            🗑️ إعادة تعيين العلاقة
+        </button>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Parse and display inner world data
+    const characterData = {
+        deep_fears: {{ character.deep_fears | safe }},
+        hidden_dreams: {{ character.hidden_dreams | safe }},
+        past_wounds: {{ character.past_wounds | safe }},
+        core_values: {{ character.core_values | safe }}
+    };
+    
+    function parseJsonSafe(data) {
+        if (typeof data === 'string') {
+            try { return JSON.parse(data); } catch(e) { return []; }
+        }
+        return Array.isArray(data) ? data : [];
+    }
+    
+    const innerWorld = document.getElementById('inner-world');
+    
+    const sections = [
+        { key: 'deep_fears', title: '😨 المخاوف العميقة', color: 'text-red-400' },
+        { key: 'hidden_dreams', title: '✨ الأحلام المخفية', color: 'text-yellow-400' },
+        { key: 'past_wounds', title: '💔 الجروح القديمة', color: 'text-purple-400' },
+        { key: 'core_values', title: '💎 القيم الأساسية', color: 'text-green-400' }
+    ];
+    
+    sections.forEach(section => {
+        const items = parseJsonSafe(characterData[section.key]);
+        const html = `
+            <div>
+                <h3 class="font-bold mb-3 ${section.color}">${section.title}</h3>
+                <ul class="space-y-2 text-gray-300">
+                    ${items.map(item => `<li class="glass px-4 py-2 rounded-lg text-sm">${item}</li>`).join('')}
+                </ul>
+            </div>
+        `;
+        innerWorld.innerHTML += html;
+    });
+    
+    function confirmReset() {
+        if (confirm('هل أنت متأكد؟ سيتم حذف كل المحادثات والذكريات!')) {
+            fetch('/api/reset/{{ character.id }}', { method: 'POST' })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) {
+                        showToast('تم إعادة التعيين بنجاح', 'success');
+                        setTimeout(() => location.reload(), 1000);
+                    }
+                });
+        }
+    }
+    
+    function deleteCharacter(charId, charName) {
+        if (confirm(`هل أنت متأكد من حذف "${charName}"؟\n\nسيتم حذف الشخصية نهائياً مع كل المحادثات والذكريات!`)) {
+            fetch(`/api/character/${charId}`, { method: 'DELETE' })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) {
+                        showToast('تم حذف الشخصية بنجاح', 'success');
+                        setTimeout(() => window.location.href = '/', 1000);
+                    } else {
+                        showToast('خطأ: ' + data.error, 'error');
+                    }
+                })
+                .catch(err => {
+                    showToast('حدث خطأ في الاتصال', 'error');
+                });
+        }
+    }
+    
+    function duplicateCharacter(charId) {
+        fetch(`/api/character/${charId}/duplicate`, { method: 'POST' })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    showToast('تم نسخ الشخصية بنجاح', 'success');
+                    setTimeout(() => window.location.href = '/character/' + data.id, 1000);
+                } else {
+                    showToast('خطأ: ' + data.error, 'error');
+                }
+            })
+            .catch(err => {
+                showToast('حدث خطأ في الاتصال', 'error');
+            });
+    }
+</script>
+{% endblock %}
